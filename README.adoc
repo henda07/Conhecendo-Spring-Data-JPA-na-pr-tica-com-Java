@@ -1,0 +1,178 @@
+image:https://spring.io/badges/spring-data-jpa/ga.svg[Spring Data JPA,link=https://projects.spring.io/spring-data-jpa/#quick-start]
+image:https://spring.io/badges/spring-data-jpa/snapshot.svg[Spring Data JPA,link=https://projects.spring.io/spring-data-jpa/#quick-start]
+
+= Spring Data JPA image:https://jenkins.spring.io/buildStatus/icon?job=spring-data-jpa%2Fmain&subject=Build[link=https://jenkins.spring.io/view/SpringData/job/spring-data-jpa/] https://gitter.im/spring-projects/spring-data[image:https://badges.gitter.im/spring-projects/spring-data.svg[Gitter]]
+
+
+O Spring Data JPA, parte da família maior do Spring Data , torna mais fácil implementar repositórios baseados em JPA. Este módulo trata do suporte aprimorado para camadas de acesso a dados baseadas em JPA. Torna mais fácil construir aplicativos com tecnologia Spring que usam tecnologias de acesso a dados.
+
+Implementar uma camada de acesso a dados de um aplicativo tem sido complicado por um bom tempo. Muito código clichê deve ser escrito para executar consultas simples, bem como realizar paginação e auditoria. O Spring Data JPA visa melhorar significativamente a implementação de camadas de acesso a dados, reduzindo o esforço para a quantidade que é realmente necessária. Como desenvolvedor, você escreve suas interfaces de repositório, incluindo métodos de localização customizados, e o Spring fornecerá a implementação automaticamente.
+
+Recursos
+Implementação de métodos CRUD para entidades JPA
+
+Geração de consulta dinâmica a partir de nomes de métodos de consulta
+
+Acionamento transparente de NamedQueries JPA por métodos de consulta
+
+Classes de base de domínio de implementação que fornecem propriedades básicas
+
+Suporte para auditoria transparente (criado, última alteração)
+
+Possibilidade de integrar código de repositório customizado
+
+Fácil integração Spring com namespace personalizado
+
+Código de Conduta
+Este projeto é regido pelo Código de Conduta da Primavera . Ao participar, espera-se que você cumpra este código de conduta. Informe o comportamento inaceitável para spring-code-of-conduct@pivotal.io .
+
+Começando
+Aqui está um teaser rápido de um aplicativo usando Spring Data Repositories em Java:
+
+[source,java]
+----
+public interface PersonRepository extends CrudRepository<Person, Long> {
+
+  List<Person> findByLastname(String lastname);
+
+  List<Person> findByFirstnameLike(String firstname);
+}
+
+@Service
+public class MyService {
+
+  private final PersonRepository repository;
+
+  public MyService(PersonRepository repository) {
+    this.repository = repository;
+  }
+
+  public void doWork() {
+
+    repository.deleteAll();
+
+    Person person = new Person();
+    person.setFirstname("Oliver");
+    person.setLastname("Gierke");
+    repository.save(person);
+
+    List<Person> lastNameResults = repository.findByLastname("Gierke");
+    List<Person> firstNameResults = repository.findByFirstnameLike("Oli*");
+ }
+}
+
+@Configuration
+@EnableJpaRepositories("com.acme.repositories")
+class AppConfig {
+
+  @Bean
+  public DataSource dataSource() {
+    return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+  }
+
+  @Bean
+  public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+    return new JpaTransactionManager(emf);
+  }
+
+  @Bean
+  public JpaVendorAdapter jpaVendorAdapter() {
+    HibernateJpaVendorAdapter jpaVendorAdapter = new HibernateJpaVendorAdapter();
+    jpaVendorAdapter.setDatabase(Database.H2);
+    jpaVendorAdapter.setGenerateDdl(true);
+    return jpaVendorAdapter;
+  }
+
+  @Bean
+  public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    LocalContainerEntityManagerFactoryBean lemfb = new LocalContainerEntityManagerFactoryBean();
+    lemfb.setDataSource(dataSource());
+    lemfb.setJpaVendorAdapter(jpaVendorAdapter());
+    lemfb.setPackagesToScan("com.acme");
+    return lemfb;
+  }
+}
+----
+
+=== Maven configuration
+
+Add the Maven dependency:
+
+[source,xml]
+----
+<dependency>
+  <groupId>org.springframework.data</groupId>
+  <artifactId>spring-data-jpa</artifactId>
+  <version>${version}.RELEASE</version>
+</dependency>
+----
+
+If you'd rather like the latest snapshots of the upcoming major version, use our Maven snapshot repository and declare the appropriate dependency version.
+
+[source,xml]
+----
+<dependency>
+  <groupId>org.springframework.data</groupId>
+  <artifactId>spring-data-jpa</artifactId>
+  <version>${version}.BUILD-SNAPSHOT</version>
+</dependency>
+
+<repository>
+  <id>spring-libs-snapshot</id>
+  <name>Spring Snapshot Repository</name>
+  <url>https://repo.spring.io/libs-snapshot</url>
+</repository>
+----
+
+Conseguindo ajuda
+Está tendo problemas com o Spring Data? Adoraríamos ajudar!
+
+Verifique a documentação de referência e Javadocs .
+
+Aprenda os fundamentos do Spring - Spring Data baseia-se no Spring Framework, verifique o site spring.io para obter uma grande quantidade de documentação de referência. Se você está apenas começando com o Spring, experimente um dos guias .
+
+Se você estiver atualizando, verifique o changelog para recursos “novos e dignos de nota”.
+
+Faça uma pergunta - monitoramos stackoverflow.com em busca de perguntas marcadas com spring-data-jpa. Você também pode bater um papo com a comunidade no Gitter .
+
+Relate bugs com Spring Data JPA no rastreador de problemas do GitHub .
+
+Problemas de relatório
+Spring Data usa GitHub como sistema de rastreamento de problemas para registrar bugs e solicitações de recursos. Se você quiser levantar um problema, siga as recomendações abaixo:
+
+Antes de registrar um bug, pesquise o rastreador de problemas para ver se alguém já relatou o problema.
+
+Se o problema ainda não existir, crie um novo .
+
+Forneça o máximo de informações possível com o relatório de problema, nós gostamos de saber a versão do Spring Data que você está usando e a versão JVM, rastreamentos de pilha completos e quaisquer informações de configuração relevantes.
+
+Se você precisar colar o código ou incluir um rastreamento de pilha, formate-o como código usando backtick triplo.
+
+Se possível, tente criar um caso de teste ou projeto que replique o problema. Anexe um link para seu código ou um arquivo compactado contendo seu código. Use um banco de dados na memória se possível ou configure o banco de dados usando Testcontainers .
+
+Construindo a partir da Fonte
+Você não precisa compilar a partir do código-fonte para usar Spring Data (binários em repo.spring.io ), mas se quiser experimentar o que há de melhor e mais recente, Spring Data pode ser facilmente compilado com o invólucro maven . Você também precisa do JDK 1.8.
+
+ $ ./mvnw instalação limpa
+Se quiser construir com o mvncomando regular , você precisará do Maven v3.5.0 ou superior .
+
+Consulte também CONTRIBUTING.adoc se desejar enviar solicitações pull e, em particular, assine o Acordo de Contribuidor antes de sua primeira alteração não trivial.
+
+Documentação de referência de construção
+Construir a documentação também constrói o projeto sem a execução de testes.
+
+ $ ./mvnw instalação limpa -Pdistribute
+A documentação gerada está disponível em target/site/reference/html/index.html.
+
+Guias
+O site spring.io contém vários guias que mostram como usar o Spring Data passo a passo:
+
+Acessando dados com JPA : Aprenda como trabalhar com persistência de dados JPA usando Spring Data JPA.
+
+Acessar dados JPA com REST é um guia para criar um serviço da web REST expondo dados armazenados com JPA por meio de repositórios.
+
+Exemplos
+Os exemplos de dados do Spring contém projetos de exemplo que explicam recursos específicos com mais detalhes.
+
+Licença
+Spring Data JPA é um software de código aberto lançado sob a licença Apache 2.0 .
